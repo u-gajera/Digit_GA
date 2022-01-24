@@ -1,0 +1,120 @@
+Nx:=512
+Ny:=128
+Nz:=1     
+
+cx:=30e-9
+cy:=30e-9
+cz:=100e-9
+
+SetGridsize(Nx, Ny, Nz)
+SetCellsize(cx, cy, cz)
+
+Mid_rect      := rect(132*cx, 132*cx)
+h_arms        := rect(190*cx, 14*cy)
+
+in_arm1   := h_arms.transl(-(Nx-190)*cx/2,  0 ,0)
+
+out_arm1  := h_arms.transl( (Nx-190)*cx/2,  50*cy ,0)
+out_arm2  := h_arms.transl( (Nx-190)*cx/2,  0      ,0)
+out_arm3  := h_arms.transl( (Nx-190)*cx/2, -50*cy ,0)
+
+add_output_arms  := Mid_rect.add(out_arm1).add(out_arm2).add(out_arm3)
+
+full_structure   := add_output_arms.add(in_arm1)
+ts := rect(420e-9, 420e-9)
+//input from the python
+
+tss13 := ts.transl(-3.5000000000000004e-06,-1.5000000000000009e-06,0)
+tss97 := ts.transl(4.499999999999998e-06,2.499999999999998e-06,0)
+tss59 := ts.transl(4.999999999999986e-07,4.499999999999998e-06,0)
+tss16 := ts.transl(-3.5000000000000004e-06,1.4999999999999983e-06,0)
+tss20 := ts.transl(-2.5000000000000006e-06,-4.5e-06,0)
+tss34 := ts.transl(-1.5000000000000009e-06,-5.000000000000011e-07,0)
+tss52 := ts.transl(4.999999999999986e-07,-2.5000000000000006e-06,0)
+tss56 := ts.transl(4.999999999999986e-07,1.4999999999999983e-06,0)
+tss61 := ts.transl(1.4999999999999983e-06,-3.5000000000000004e-06,0)
+tss58 := ts.transl(4.999999999999986e-07,3.499999999999998e-06,0)
+
+decomplex := full_structure.sub(tss13).sub(tss97).sub(tss59).sub(tss16).sub(tss20).sub(tss34).sub(tss52).sub(tss56).sub(tss61).sub(tss58)
+//end input from the python
+demultiflexer := zrange(-50e-9, 50e-9).intersect(decomplex)
+setgeom(decomplex) 
+
+
+//defining regions
+defRegion(1, xrange( -Nx*cx/2,       -Nx*cx/2+1e-6) ) // left 1-um damped YIG
+defRegion(2, xrange(-Nx*cx/2+1e-6, Nx*cx/2-1e-6) ) // middle YIG
+defRegion(3, xrange(Nx*cx/2-1e-6,   Nx*cx/2      ) ) // right 1-um damped YIG
+save(regions) 
+
+Msat.setRegion(0,0)         
+Aex.setRegion(0,0)
+alpha.setRegion(0,10000)
+
+Msat.setRegion(1,  140e3)         
+Aex.setRegion(1, 3.5e-12)
+alpha.setRegion(1,  0.5)
+Ku1.setRegion (1, 14e3)               
+anisU.setRegion(1, vector(0, 0, 1)) 
+
+
+Msat.setRegion(2,  140e3)         
+Aex.setRegion(2, 3.5e-12)
+alpha.setRegion(2, 2e-4)
+Ku1.setRegion (2, 14e3)               //Hani= 2Ku/Ms (T) = 2x14e3/140e3 = 0.2 T       
+anisU.setRegion(2, vector(0, 0, 1)) 
+
+
+Msat.setRegion(3, 140e3)         
+Aex.setRegion(3, 3.5e-12)
+alpha.setRegion(3, 0.5)
+Ku1.setRegion (3, 14e3)               
+anisU.setRegion(3, vector(0, 0, 1)) 
+
+T_loc := 1e-9
+pos1  := Nx/4
+B_exc := 1e-3  //10mT -- nonlinear SW excitation
+mask0 := newVectorMask(Nx, Ny, Nz)
+
+
+for i := pos1; i<pos1+1;  i++ {
+    for j := 0; j< Ny;    j++ {
+	for k := 0; k<Nz;     k++ {
+	    r := index2coord(i,j,k)
+	    x := r.X()
+	    y := r.Y()
+	    z := r.Z()
+	    mask0.setVector(i,j,k, vector(1.0, 0, 0))
+	}
+    }
+}
+
+mask1 := mask0
+mask2 := mask0
+mask3 := mask0
+mask4 := mask0
+mask5 := mask0
+mask6 := mask0
+mask7 := mask0
+mask8 := mask0
+
+//input frequncies from the python
+f0    := 2.5e9
+f1    := 2.5e9
+f2    := 2.5e9
+
+B_ext.add(mask0, B_exc*sin(2*pi*f0*(t-T_loc)))
+B_ext.add(mask0, B_exc*sin(2*pi*f1*(t-T_loc)))
+B_ext.add(mask0, B_exc*sin(2*pi*f2*(t-T_loc)))
+//end frequncies from the python
+
+m = uniform(0, 0, 1)
+B_ext = vector(0, 0, 0e-3)
+
+relax()
+OutputFormat = OVF2_TEXT
+
+autosave(m, 10e-9)
+//autosave(B_eff,10e-9)
+
+run(51e-9)

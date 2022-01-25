@@ -8,3 +8,4 @@ Need to check the fitness function
 
 #Things to keep in mind
 Cell sizes and intensity caclulator file
+change path in intensity calculator

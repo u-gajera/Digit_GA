@@ -8,11 +8,10 @@ import numpy as np
 import random
 import matplotlib.pylab as plt
 import os
-#get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 main_path = 'C:\\Users\\Uday Aalto Account\\OneDrive - Aalto University\\Documents\\mumax\\magnonic_device'
-analysis_path = '\Algorithms'
+analysis_path = '\Digit_GA\Digit_GA_with_3_arms'
 os.chdir(main_path+analysis_path)
 
 
@@ -71,15 +70,11 @@ class IntensityCalculation:
 
 def calculate_intensities_all_arms(mumaxOutputFile):
     intensities = []
-    xcellranges = [range(328,478),range(328,478),range(328,478),
-                   range(302,303),range(253,254),range(203,204),
-                   range(28 ,178),range(28 ,178),range(28 ,178)]
+    xcellranges = [range(340,455),range(340,455),range(340,455)]
     
-    ycellranges = [range(203,204),range(253,254),range(302,303),
-                   range(328,478),range(328,478),range(328,478),
-                   range(302,303),range(253,254),range(203,204)]
+    ycellranges = [range(12,14),  range(62,64),  range(112,114)]
     
-    for ii in range(9):
+    for ii in range(3):
         obj = IntensityCalculation(filename = mumaxOutputFile, 
                                    xcellrange=xcellranges[ii], 
                                    ycellrange=ycellranges[ii], 
@@ -87,25 +82,6 @@ def calculate_intensities_all_arms(mumaxOutputFile):
         selected_mx, selected_my, selected_mz = obj.getSelectedM()
         intensities.append(np.average(np.sqrt(selected_mx**2+selected_my**2)))
     return intensities
-
-'''def calculate_intensities_all_arms(mumaxOutputFile):
-    intensities = []
-    xcellranges = [range(655,955),range(655,955),range(655,955),
-                   range(605,607),range(505,507),range(405,407),
-                   range(55 ,355),range(55 ,355),range(55 ,355)]
-    
-    ycellranges = [range(405,407),range(505,507),range(605,607),
-                   range(655,955),range(655,955),range(655,955),
-                   range(605,607),range(505,507),range(405,407)]
-    
-    for ii in range(9):
-        obj = IntensityCalculation(filename = mumaxOutputFile, 
-                                   xcellrange=xcellranges[ii], 
-                                   ycellrange=ycellranges[ii], 
-                                   zcellrange=range(0,1))
-        selected_mx, selected_my, selected_mz = obj.getSelectedM()
-        intensities.append(np.average(np.sqrt(selected_mx**2+selected_my**2)))
-    return intensities'''
 
 '''
 #Example

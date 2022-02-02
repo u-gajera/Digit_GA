@@ -11,7 +11,7 @@ import os
 
 
 main_path = 'C:\\Users\\Uday Aalto Account\\OneDrive - Aalto University\\Documents\\mumax\\magnonic_device'
-analysis_path = '\Digit_GA\Digit_GA_with_3_arms'
+analysis_path = '\Digit_GA\Digit_GA_half_integral'
 os.chdir(main_path+analysis_path)
 
 
